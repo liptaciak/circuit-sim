@@ -15,6 +15,8 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     set_target_properties(circuit PROPERTIES SUFFIX ".html")
     target_link_options(circuit PRIVATE
         --shell-file=${SHELL_FILE}
-        -s USE_SDL=3
+        -sUSE_SDL=3
+        -sFULL_ES3=1
+        -sALLOW_MEMORY_GROWTH=1
     )
 endif()

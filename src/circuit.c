@@ -5,42 +5,33 @@ SDL_Window* window;
 SDL_Renderer* renderer;
 
 void main_loop(void* arg) {
+    SDL_Texture* tex = (SDL_Texture*)arg;
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    SDL_Vertex verts[3];
-    verts[0].position.x = 400.0f; 
-    verts[0].position.y = 100.0f; 
-    verts[0].color.r = 255;
-    verts[0].color.g = 0; 
-    verts[0].color.b = 0; 
-    verts[0].color.a = 255;
-    
-    verts[1].position.x = 300.0f; 
-    verts[1].position.y = 400.0f; 
-    verts[1].color.r = 255; 
-    verts[1].color.g = 0; 
-    verts[1].color.b = 0; 
-    verts[1].color.a = 255;
-
-    verts[2].position.x = 500.0f; 
-    verts[2].position.y = 400.0f; 
-    verts[2].color.r = 255; 
-    verts[2].color.g = 0; 
-    verts[2].color.b = 0; 
-    verts[2].color.a = 255;
+    SDL_Vertex verts[3] = {
+        {{400.0f, 225.0f}, {255, 0, 0, 254}, {0,0}},
+        {{300.0f, 400.0f}, {255, 0, 0, 254}, {0,0}},
+        {{500.0f, 400.0f}, {255, 0, 0, 254}, {0,0}}
+    };
 
     int indices[3] = {0, 1, 2};
-    SDL_RenderGeometry(renderer, NULL, verts, 3, indices, 3);
+    SDL_RenderGeometry(renderer, tex, verts, 3, indices, 3);
     SDL_RenderPresent(renderer);
 }
 
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
-    
-    window = SDL_CreateWindow("SDL3 Triangle", 800, 600, 0);
+
+    window = SDL_CreateWindow("Circuit Simulator", 800, 600, 0);
     renderer = SDL_CreateRenderer(window, NULL);
 
-    emscripten_set_main_loop_arg(main_loop, renderer, 0, 1);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+    SDL_Texture* tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, 1, 1);
+    Uint32 white = 0xFFFFFFFF;
+    SDL_UpdateTexture(tex, NULL, &white, sizeof(Uint32));
+
+    emscripten_set_main_loop_arg(main_loop, tex, 0, 1);
     return 0;
 }
