@@ -1,6 +1,13 @@
 #ifndef __circuit__
 #define __circuit__
 
+/*
+    enum circuit_stage_t {
+        STAGE_COMPILE,
+        STAGE_SIMULATE
+    };
+*/
+
 enum circuit_element_type_t {
     CONDUCTOR,
     VSOURCE,
@@ -11,12 +18,17 @@ enum circuit_element_type_t {
     DIODE
 };
 
+struct circuit_node_t {
+    float voltage;
+};
+
 struct circuit_element_t {
     enum circuit_element_type_t type;
 
-    // Used for rendering
-    float x;
-    float y;
+    /*
+        float x;
+        float y;
+    */
 
     union {
         struct { }                     conductor;
@@ -28,12 +40,12 @@ struct circuit_element_t {
         struct { float current; }      isource;
     };
 
-    void (*draw)(struct circuit_element_t* element);
-    struct circuit_element_t** next;
+    struct circuit_node_t** nodes;
 };
 
 struct circuit_t {
-    struct circuit_element_t* head;
+    // enum circuit_stage_t current_stage;
+
     struct circuit_element_t* elements;
     size_t num_elements;
 };

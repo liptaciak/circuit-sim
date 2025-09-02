@@ -1,52 +1,67 @@
 #include <SDL3/SDL.h>
 #include <emscripten/emscripten.h>
 
+#include "circuit.h"
+
 SDL_Window* window;
 SDL_Renderer* renderer;
 
-void process_circuit_element(struct circuit_element_t* element) {
-    // Process the circuit element (e.g., update its state, render it, etc.)
+void simulate_circuit(struct circuit_t* circuit) {
+    for (size_t i = 0; i < circuit->num_elements; i++) {
+        switch (circuit->elements[i].type) {
+            case CONDUCTOR: {
+                // Just an example, i will rewrite this.
+
+                struct circuit_node_t* node_a = circuit->elements[i].nodes[0];
+                struct circuit_node_t* node_b = circuit->elements[i].nodes[1];
+
+                if (node_a->voltage != 0.0f) {
+                    node_b->voltage = node_a->voltage;
+                } else if (node_b->voltage != 0.0f) {
+                    node_a->voltage = node_b->voltage;
+                }
+                break;
+            }
+            case VSOURCE:
+                break;
+            case ISOURCE:
+                break;
+            case RESISTOR:
+                break;
+            case CAPACITOR:
+                break;
+            case INDUCTOR:
+                break;
+            case DIODE:
+                break;
+        }
+    }
+    return;
+}
+
+void render_circuit(struct circuit_t* circuit) {
+    return;
 }
 
 void main_loop(void* arg) {
-    struct circuit_t state = (struct circuit_t*)arg;
+    struct circuit_t* circuit_state = (struct circuit_t*)arg;
 
-    process_circuit_element(state.head);
+    /*
+        switch (...)
+    */
+
+    simulate_circuit(circuit_state);
+    render_circuit(circuit_state);
 }
 
 int main() {
-    struct circuit_element_t source;
-    struct circuit_element_t resistor;
-
-    source.type = VSOURCE;
-    source.x = 100.0f;
-    source.y = 100.0f;
-    source.vsource.voltage = 5.0f;
-    source.draw = NULL;
-
-    resistor.type = RESISTOR;
-    resistor.x = 200.0f;
-    resistor.y = 200.0f;
-    resistor.resistor.resistance = 1000.0f;
-    resistor.draw = NULL;
-
-    struct circuit_element_t* source_next[] = { &resistor, NULL };
-    source.next = source_next;
-
-    struct circuit_element_t* resistor_next[] = { &source, NULL };
-    resistor.next = resistor_next;
-
     SDL_Init(SDL_INIT_VIDEO);
 
     window = SDL_CreateWindow("Circuit Simulator", 800, 600, 0);
     renderer = SDL_CreateRenderer(window, NULL);
 
-    struct circuit_t state;
-    
-    state.head = &source;
-    state.elements = &source;
-    state.num_elements = 2;
+    struct circuit_t circuit_state = { NULL, 0 };
+    emscripten_set_main_loop_arg(main_loop, &circuit_state, 0, 1);
 
-    emscripten_set_main_loop_arg(main_loop, &state, 0, 1);
     return 0;
 }
